@@ -1,0 +1,8 @@
+<div class="form-group" *ngFor="let locale of locales">
+  <ng-container *ngIf="translation && translation[locale]">
+  <label for="en">{{ locale }}</label>
+  <input id="en" type="text" [(ngModel)]="translation[locale]" />
+  </ng-container>
+</div>
+
+<button class="btn btn-primary">Save</button>
