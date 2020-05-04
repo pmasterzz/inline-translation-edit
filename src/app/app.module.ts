@@ -19,6 +19,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 }
 
 @NgModule({
+  entryComponents: [TranslateDetailComponent, TranslateTooltipComponent],
   declarations: [
     AppComponent,
     TranslateDirective,

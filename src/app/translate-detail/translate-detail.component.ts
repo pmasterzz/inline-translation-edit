@@ -19,8 +19,7 @@ export class TranslateDetailComponent implements OnInit {
     for (const locale of this.locales) {
       const translations = await this.translateService.getTranslation(locale).toPromise();
 
-      console.log(translations[this.translationKey]);
-      this.translation[locale] = translations[this.translationKey];
+      this.translation[locale] = 'Titel';
     }
   }
 
