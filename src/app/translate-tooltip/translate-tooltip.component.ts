@@ -11,12 +11,14 @@ import { TranslateDetailComponent } from '../translate-detail/translate-detail.c
 })
 export class TranslateTooltipComponent implements OnInit {
   @Input()
-  public key: string;
+  public keys: string[];
 
   @Output()
   public onMouseOut = new EventEmitter();
 
-  constructor(private translateKeyService: TranslateKeyService, private dialogService: DialogService) {
+  constructor(
+    private translateKeyService: TranslateKeyService,
+    private dialogService: DialogService) {
   }
 
   @HostListener('mouseleave', ['$event'])

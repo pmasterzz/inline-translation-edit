@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { TranslateDetailComponent } from './translate-detail/translate-detail.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ComplexComponent } from './complex/complex.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -24,7 +25,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppComponent,
     TranslateDirective,
     TranslateTooltipComponent,
-    TranslateDetailComponent
+    TranslateDetailComponent,
+    ComplexComponent
   ],
   imports: [
     BrowserModule,

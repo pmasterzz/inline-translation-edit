@@ -10,12 +10,16 @@ import { TranslateKeyService } from './translate-key.service';
 export class AppComponent {
   title = 'inline-translation';
 
-  constructor(private translateService: TranslateService) {
+  constructor(private translateService: TranslateService, public translateKeyService: TranslateKeyService) {
     this.translateService.setDefaultLang('en');
     this.translateService.use('en');
   }
 
   public onClick(): void {
     alert('hi');
+  }
+
+  public toggleEditMode(): void {
+    this.translateKeyService.editMode = !this.translateKeyService.editMode;
   }
 }

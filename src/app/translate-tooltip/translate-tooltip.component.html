@@ -1,6 +1,7 @@
 <div class="my-tooltip">
-  <div class="p-2">
-    {{ key }}
+  <h5>Translations:</h5>
+  <div class="p-2" *ngFor="let key of keys">
+    {{ key | translate }}
     <button class="btn" (click)="editKey(key)"><i class="fa fa-edit"></i></button>
   </div>
 </div>

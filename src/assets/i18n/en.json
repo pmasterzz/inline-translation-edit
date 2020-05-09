@@ -1,3 +1,14 @@
 {
-  "general.title": "Title"
+  "general.title": "Title",
+  "general.test": "Input label",
+  "card" : {
+    "header": "Card",
+    "title": "Card title",
+    "text": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque deserunt error exercitationem facere minus molestias, sed soluta? Dolores, hic in inventore nobis non optio perspiciatis possimus qui, quos ratione vero.",
+    "item1": "Cras justo odio",
+    "item2": "Cras mome odio",
+    "item3": "Cras justo odio",
+    "link1": "Card link",
+    "link2": "Another link"
+  }
 }

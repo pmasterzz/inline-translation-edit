@@ -5,4 +5,38 @@
   <input id="x" type="text" />
 
   <button appTranslate="general.test" (click)="onClick()"></button>
+
+
+  <div class="row">
+    <div class="col-md-6">
+      <h3 appTranslate="card.header"></h3>
+
+      <div class="card" style="width: 18rem;">
+        <div class="card-body">
+          <h5 class="card-title" appTranslate="card.title"></h5>
+          <p class="card-text" appTranslate="card.text"></p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item" appTranslate="card.item1"></li>
+          <li class="list-group-item" appTranslate="card.item2"></li>
+          <li class="list-group-item" appTranslate="card.item3"></li>
+        </ul>
+        <div class="card-body">
+          <a href="#" class="card-link" appTranslate="card.link1"></a>
+          <a href="#" class="card-link" appTranslate="card.link2"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <app-complex [appTranslate]="{label: 'general.test', pep: 'card.header'}" label="test123"></app-complex>
+    </div>
+  </div>
+
+
+  <div class="my-5">
+    <button class="btn btn-success" (click)="toggleEditMode()">
+      {{ translateKeyService.editMode ? 'Turn off edit mode' : 'Turn on edit mode' }}
+    </button>
+  </div>
 </div>

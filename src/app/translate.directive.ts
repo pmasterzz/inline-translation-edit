@@ -1,4 +1,15 @@
-import { ChangeDetectorRef, ComponentRef, Directive, ElementRef, HostListener, Input, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  ComponentRef,
+  Directive,
+  ElementRef,
+  Host,
+  HostListener,
+  Input,
+  OnInit,
+  Optional,
+  ViewContainerRef
+} from '@angular/core';
 import { TranslateKeyService } from './translate-key.service';
 import { TranslateService } from '@ngx-translate/core';
 import { filter, first } from 'rxjs/operators';
@@ -6,6 +17,7 @@ import { Overlay, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overla
 import { ComponentPortal } from '@angular/cdk/portal';
 import { TranslateTooltipComponent } from './translate-tooltip/translate-tooltip.component';
 import { DialogService } from 'primeng/dynamicdialog';
+import { BaseComponent } from './base-component';
 
 @Directive({
   selector: '[appTranslate]',
@@ -13,27 +25,39 @@ import { DialogService } from 'primeng/dynamicdialog';
 })
 export class TranslateDirective implements OnInit {
   @Input()
-  public set appTranslate(key: string) {
-    this.translationKey = key;
-    this.setTranslation();
+  public set appTranslate(key: string | Record<string, string>) {
+    if (typeof key === 'string') {
+      this.translationKeys = [key];
+      this.setTranslation(key);
+    } else {
+      for (const attribute in key) {
+        if (key.hasOwnProperty(attribute)) {
+          this.translationKeys = [...this.translationKeys, key[attribute]];
+          this.setAttributeTranslation(attribute, key[attribute]);
+        }
+      }
+    }
   }
 
   private overlayRef: OverlayRef;
   public translationKey: string;
+  public translationKeys: string[] = [];
 
-  @HostListener('mouseenter', ['$event'])
+  @HostListener('mouseover', ['$event'])
   public onElementClick(event) {
-    event.preventDefault();
-    event.stopPropagation();
+    if (this.translateService.editMode) {
+      event.preventDefault();
+      event.stopPropagation();
 
-    if (!this.overlayRef.hasAttached()) {
-      const tooltipPortal = new ComponentPortal(TranslateTooltipComponent);
-      const tooltipRef: ComponentRef<TranslateTooltipComponent> = this.overlayRef.attach(tooltipPortal);
-      tooltipRef.instance.key = this.translationKey;
-      tooltipRef.instance.onMouseOut.subscribe( () => {
-        console.log('OUT');
-        this.overlayRef.detach();
-      });
+      if (!this.overlayRef.hasAttached()) {
+        const tooltipPortal = new ComponentPortal(TranslateTooltipComponent);
+        const tooltipRef: ComponentRef<TranslateTooltipComponent> = this.overlayRef.attach(tooltipPortal);
+
+        tooltipRef.instance.keys = this.translationKeys;
+        tooltipRef.instance.onMouseOut.subscribe(() => {
+          this.overlayRef.detach();
+        });
+      }
     }
 
     return false;
@@ -41,8 +65,10 @@ export class TranslateDirective implements OnInit {
 
   @HostListener('mouseout', ['$event'])
   hide(target) {
-    if (target.toElement.className !== 'my-tooltip' && target.toElement.parentNode.className !== 'my-tooltip') {
-      this.overlayRef.detach();
+    if (this.translateService.editMode) {
+      if (!target.toElement || target.toElement.className !== 'my-tooltip' && target.toElement.parentNode.className !== 'my-tooltip') {
+        this.overlayRef.detach();
+      }
     }
   }
 
@@ -52,16 +78,14 @@ export class TranslateDirective implements OnInit {
               private overlayPositionBuilder: OverlayPositionBuilder,
               private translateService: TranslateKeyService,
               private dialogService: DialogService,
+              private view: ViewContainerRef,
+              @Optional() @Host() private baseComponent: BaseComponent,
               private ngxTranslateService: TranslateService) {
   }
 
   public ngOnInit(): void {
     const positionStrategy = this.overlayPositionBuilder
-      // Create position attached to the elementRef
       .flexibleConnectedTo(this.element)
-      // Describe how to connect overlay to the elementRef
-      // Means, attach overlay's center bottom point to the
-      // top center point of the elementRef.
       .withPositions([{
         originX: 'start',
         originY: 'top',
@@ -69,17 +93,22 @@ export class TranslateDirective implements OnInit {
         overlayY: 'bottom'
       }]);
     this.overlayRef = this.overlay.create({ positionStrategy });
-
   }
 
-  public setTranslation(): void {
-    this.ngxTranslateService.get(this.translationKey).pipe(filter((translation) => !!translation), first()).subscribe((translation) => {
+  public setTranslation(translationKey: string): void {
+    this.ngxTranslateService.get(translationKey).pipe(filter((translation) => !!translation), first()).subscribe((translation) => {
       this.updateValue(translation);
     });
   }
 
   public updateValue(translation): void {
     this.element.nativeElement.textContent = translation;
+  }
+
+  public setAttributeTranslation(attribute: string, translationKey: string): void {
+    this.ngxTranslateService.get(translationKey).pipe(filter((translation) => !!translation), first()).subscribe((translation) => {
+      this.baseComponent[attribute] = translation;
+    });
   }
 
 }

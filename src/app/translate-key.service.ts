@@ -5,7 +5,7 @@ import { Observable, Subject } from 'rxjs';
   providedIn: 'root'
 })
 export class TranslateKeyService {
-  public editMode = true;
+  public editMode = false;
   private currentTranslation = new Subject<string>();
 
   constructor() {
