@@ -6,24 +6,24 @@ import {
   Host,
   HostListener,
   Input,
+  OnDestroy,
   OnInit,
   Optional,
   ViewContainerRef
 } from '@angular/core';
 import { TranslateKeyService } from './translate-key.service';
 import { TranslateService } from '@ngx-translate/core';
-import { filter, first } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
 import { Overlay, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { TranslateTooltipComponent } from './translate-tooltip/translate-tooltip.component';
-import { DialogService } from 'primeng/dynamicdialog';
 import { BaseComponent } from './base-component';
+import { Subject } from 'rxjs';
 
 @Directive({
-  selector: '[appTranslate]',
-  providers: [DialogService]
+  selector: '[appTranslate]'
 })
-export class TranslateDirective implements OnInit {
+export class TranslateDirective implements OnInit, OnDestroy {
   @Input()
   public set appTranslate(key: string | Record<string, string>) {
     if (typeof key === 'string') {
@@ -39,9 +39,14 @@ export class TranslateDirective implements OnInit {
     }
   }
 
-  private overlayRef: OverlayRef;
   public translationKey: string;
   public translationKeys: string[] = [];
+  private overlayRef: OverlayRef;
+  private destroy$ = new Subject<void>();
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+  }
 
   @HostListener('mouseover', ['$event'])
   public onElementClick(event) {
@@ -77,7 +82,6 @@ export class TranslateDirective implements OnInit {
               private cdr: ChangeDetectorRef,
               private overlayPositionBuilder: OverlayPositionBuilder,
               private translateService: TranslateKeyService,
-              private dialogService: DialogService,
               private view: ViewContainerRef,
               @Optional() @Host() private baseComponent: BaseComponent,
               private ngxTranslateService: TranslateService) {
@@ -96,9 +100,12 @@ export class TranslateDirective implements OnInit {
   }
 
   public setTranslation(translationKey: string): void {
-    this.ngxTranslateService.get(translationKey).pipe(filter((translation) => !!translation), first()).subscribe((translation) => {
-      this.updateValue(translation);
-    });
+    this.ngxTranslateService.stream(translationKey).pipe(
+      filter((translation) => !!translation),
+      takeUntil(this.destroy$))
+      .subscribe((translation) => {
+        this.updateValue(translation);
+      });
   }
 
   public updateValue(translation): void {
@@ -106,9 +113,12 @@ export class TranslateDirective implements OnInit {
   }
 
   public setAttributeTranslation(attribute: string, translationKey: string): void {
-    this.ngxTranslateService.get(translationKey).pipe(filter((translation) => !!translation), first()).subscribe((translation) => {
-      this.baseComponent[attribute] = translation;
-    });
+    this.ngxTranslateService.stream(translationKey).pipe(
+      filter((translation) => !!translation),
+      takeUntil(this.destroy$))
+      .subscribe((translation) => {
+        this.baseComponent[attribute] = translation;
+      });
   }
 
 }

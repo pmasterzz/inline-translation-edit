@@ -34,4 +34,12 @@ export class TranslateDetailComponent implements OnInit {
     }
   }
 
+  public save(): void {
+    this.translateService.set(this.config.data.translationKey, this.translation.en, 'en');
+    setTimeout(() => {
+      this.translateService.getTranslation('en').subscribe((res) => {
+      });
+    }, 1000);
+  }
+
 }
